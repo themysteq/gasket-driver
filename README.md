@@ -1,5 +1,11 @@
 # Coral Gasket Driver
 
+## :warning: (NOTICE) TrueNAS Scale :warning:
+
+This repo is a PoC of module to be compatible directly with TrueNAS Scale build system
+
+
+
 The Coral Gasket Driver allows usage of the [Coral EdgeTPU](https://coral.ai/) on Linux systems. The driver contains two modules:
 
 * Gasket: Gasket (Google ASIC Software, Kernel Extensions, and Tools) is a top level driver for lightweight communication with Google ASICs.
