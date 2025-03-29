@@ -1,18 +1,51 @@
 #!/usr/bin/make -f
 
-include /usr/share/dpkg/pkg-info.mk
+export DH_VERBOSE = 1
+
+# include /usr/share/dpkg/pkg-info.mk
+
+# rules won't see variables unless they're using DEB_foo_SET syntax. So use that as
+# an intermediary. Also, export variables for sub-makes to be able to see them.
+#export KVER=$(DEB_KVER_SET)
+#export KDIR=$(DEB_KDIR_SET)
+#export KVER=$(DEB_KVER_SET)
+
+#export CC=$(DEB_CC_SET)
+#export QLA_DIR=$(DEB_QLA_DIR_SET)
+#export QLA_INI_DIR=$(DEB_QLA_INI_DIR_SET)
+#export PKG_BUILD_MODE=$(DEB_PKG_BUILD_MODE)
+
+MODULE_NAME := gasket
+SRC_DIR := src
+export KVER := $(shell apt info linux-headers-truenas-production-amd64 | awk '/Source:/ { print $$2 }' | sed 's/linux-//')
+KDIR := /lib/modules/$(KVER)/build
+# Exit if KVER or KDIR are not defined
+#
+ifeq ($(KVER),)
+$(error KVER is not defined)
+endif
+
+ifeq ($(KDIR),)
+$(error KDIR is not defined)
+endif
 
 %:
-	dh $@ --with dkms
+	echo "*** dh $@ ***"
+	echo "custom: KVER is $(KVER)"
+	echo "custom: KDIR is $(KDIR)"
+	dh $@ 
 
-override_dh_install:
-	dh_install src/* usr/src/gasket-$(DEB_VERSION_UPSTREAM)/
 
-override_dh_dkms:
-	dh_dkms -V $(DEB_VERSION_UPSTREAM)
-
-override_dh_auto_configure:
 override_dh_auto_build:
-override_dh_auto_test:
+	make -C $(KDIR) M=$(CURDIR)/$(SRC_DIR) modules
+
 override_dh_auto_install:
+	install -d $(CURDIR)/debian/$(MODULE_NAME)/lib/modules/$(KVER)/extra/
+	install -m 644 $(SRC_DIR)/*.ko $(CURDIR)/debian/$(MODULE_NAME)/lib/modules/$(KVER)/extra/
+
+override_dh_usrlocal:
+	# No installation to /usr/local, skipping
+
 override_dh_auto_clean:
+	make -C $(KDIR) M=$(CURDIR)/$(SRC_DIR) clean
+
