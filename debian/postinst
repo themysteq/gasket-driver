@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+# Regenerate module dependencies
+depmod
+
+# Load modules (replace names if you have multiple)
+modprobe gasket || true
+modprobe apex || true
+
+exit 0
+

@@ -42,6 +42,7 @@ override_dh_auto_build:
 override_dh_auto_install:
 	install -d $(CURDIR)/debian/$(MODULE_NAME)/lib/modules/$(KVER)/extra/
 	install -m 644 $(SRC_DIR)/*.ko $(CURDIR)/debian/$(MODULE_NAME)/lib/modules/$(KVER)/extra/
+	install -D -m 644 debian/gasket.modules $(CURDIR)/debian/$(MODULE_NAME)/etc/modules-load.d/$(MODULE_NAME).conf
 
 override_dh_usrlocal:
 	# No installation to /usr/local, skipping
